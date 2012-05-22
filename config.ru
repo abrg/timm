@@ -1,6 +1,12 @@
-//use Rack::Static, :urls => ["/images"], :root => "public"
-//run lambda { |env| [200, { 'Content-Type' => 'text/html', 'Cache-Control' =>
-//'public, max-age=86400' }, File.open('public/index.html', File::RDONLY)] }
+# Static site using Rack (with expire headers and etag support)... great for hosting static sites on Heroku
 
-// apparently this will find and serve everything, not sure i want to do that
-use Rack::Static, :urls => [/./], :root => “public”
+require "bundler/setup"
+require 'rack/contrib'
+require 'rack-rewrite'
+
+use Rack::StaticCache, :urls => ['/images','/css', '/js','/favicon.ico'], :root => "public"
+use Rack::ETag
+use Rack::Rewrite do
+  rewrite '/', '/index.html'
+end
+run Rack::Directory.new('public')
